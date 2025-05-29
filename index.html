@@ -3,116 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VifactCheck - Fact Checking Platform</title>
+    <title>ViFactCheck: A New Benchmark Dataset and Methods for Multi-domain News Fact-Checking in Vietnamese</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header>
         <nav>
-            <div class="logo">
-                <h1>VifactCheck</h1>
+            <div class="logo-container">
+                <img src="image/Logo_UIT_In.jpg" alt="UIT Logo" class="logo uit-logo">
+                <img src="image/UIT_NLP_LOGO.png" alt="UIT NLP Lab Logo" class="logo nlp-logo">
+                <div class="project-title"><span class="vi">Vi</span><span class="fact">Fact</span><span class="check">Check</span></div>
             </div>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
+                <a href="#abstract">Abstract</a>
+                <a href="#dataset">Dataset</a>
+                <a href="#methods">Methods</a>
+                <a href="#results">Results</a>
+                <a href="#citation">Citation</a>
             </div>
         </nav>
+        <div class="paper-header">
+            <h1 class="paper-title">ViFactCheck: A New Benchmark Dataset and Methods for Multi-domain News Fact-Checking in Vietnamese</h1>
+            
+            <div class="authors">
+                <p>Thai-Hoa Tran<sup>1,2</sup>, Quang-Duy Tran<sup>1,2</sup>, Khanh Quoc Tran<sup>1,2</sup>, Kiet Van Nguyen<sup>1,2*</sup></p>
+            </div>
+            
+            <div class="affiliations">
+                <p><sup>1</sup> Faculty of Information Science and Engineering, University of Information Technology</p>
+                <p><sup>2</sup> Vietnam National University, Ho Chi Minh City, Vietnam</p>
+            </div>
+            
+            <div class="contact-info">
+                <a href="mailto:21522082@gm.uit.edu.vn"><i class="fas fa-envelope"></i> 21522082@gm.uit.edu.vn</a>
+                <a href="mailto:20512013@gm.uit.edu.vn"><i class="fas fa-envelope"></i> 20512013@gm.uit.edu.vn</a>
+                <a href="mailto:khanhtq@uit.edu.vn"><i class="fas fa-envelope"></i> khanhtq@uit.edu.vn</a>
+                <a href="mailto:kietnv@uit.edu.vn"><i class="fas fa-envelope"></i> kietnv@uit.edu.vn</a>
+            </div>
+            
+            <div class="paper-links">
+                <a href="https://ojs.aaai.org/index.php/AAAI/article/view/32008" class="paper-link" title="Paper"><i class="fas fa-file-pdf"></i> Paper</a>
+                <a href="https://github.com/TTHHA/ViFactCheck" class="github-link" title="GitHub"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://huggingface.co/collections/tranthaihoa/aaai2025-67f8e7204bbffa951b3ab0b3" class="huggingface-link" title="Hugging Face"><i class="fas fa-robot"></i> Hugging Face</a>
+            </div>
+        </div>
     </header>
 
     <main>
-        <section class="hero">
-            <div class="hero-content">
-                <h1>AI-Powered Fact Checking</h1>
-                <p>Verify information with confidence using our advanced fact-checking platform</p>
-                <button class="cta-button">Get Started</button>
+        <section class="abstract">
+            <h2>Abstract</h2>
+            <p>The rapid spread of information in the digital age highlights the critical need for effective fact-checking tools, particularly for languages with limited resources, such as Vietnamese. In response to this challenge, we introduce ViFactCheck, the first publicly available benchmark dataset designed specifically for Vietnamese fact-checking across multiple online news domains. This dataset contains 7,232 human-annotated pairs of claim-evidence combinations sourced from reputable Vietnamese online news, covering 12 diverse topics. It has been subjected to a meticulous annotation process to ensure high quality and reliability, achieving a Fleiss Kappa inter-annotator agreement score of 0.83.</p>
+        </section>
+
+        <section id="dataset" class="dataset">
+            <h2>Dataset & Models</h2>
+            <div class="dataset-content">
+                <div class="dataset-stats">
+                    <div class="stat-card">
+                        <h3>Dataset Size</h3>
+                        <p>7,232 Claims</p>
+                        <p class="stat-detail">Human-annotated pairs</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Topics</h3>
+                        <p>12 Domains</p>
+                        <p class="stat-detail">Multi-domain coverage</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Agreement</h3>
+                        <p>0.83 Kappa</p>
+                        <p class="stat-detail">High reliability</p>
+                    </div>
+                </div>
+                <div class="dataset-details">
+                    <h3>Dataset Creation Process</h3>
+                    <div class="method-steps">
+                        <div class="method-step">
+                            <h4>1. Data Collection</h4>
+                            <p>Sourced from reputable Vietnamese online news sources, covering 12 diverse topics</p>
+                        </div>
+                        <div class="method-step">
+                            <h4>2. Annotation Process</h4>
+                            <p>Rigorous human annotation with 0.83 Fleiss Kappa inter-annotator agreement</p>
+                        </div>
+                        <div class="method-step">
+                            <h4>3. Quality Control</h4>
+                            <p>Strict monitoring by experts to ensure high quality dataset</p>
+                        </div>
+                    </div>
+                    <h3>Available Models</h3>
+                    <div class="model-categories">
+                        <div class="model-category">
+                            <h4>Pre-trained Models</h4>
+                            <ul class="model-list">
+                                <li><strong>XLM-R:</strong> xlm_base_full, xlm_large_full</li>
+                                <li><strong>BERT:</strong> ViBERT_Full, mBert_Full</li>
+                                <li><strong>PhoBERT:</strong> phobert_base_Context, phobert_large_Context</li>
+                            </ul>
+                        </div>
+                        <div class="model-category">
+                            <h4>Large Language Models</h4>
+                            <ul class="model-list">
+                                <li><strong>Gemma:</strong> gemma_context (89.90% F1)</li>
+                                <li><strong>Gemini:</strong> gemini_context (87.30% F1)</li>
+                                <li><strong>Mistral:</strong> mistral_context</li>
+                                <li><strong>Llama:</strong> llama2_context, llama3_context</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="model-note">All models and dataset are publicly available on Hugging Face. You can access them through our <a href="https://huggingface.co/collections/tranthaihoa/aaai2025-67f8e7204bbffa951b3ab0b3" class="external-link">Hugging Face Collection</a>.</p>
+                </div>
             </div>
         </section>
 
-        <section id="features" class="features">
-            <h2>Key Features</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <i class="fas fa-robot"></i>
-                    <h3>AI Analysis</h3>
-                    <p>Advanced AI algorithms analyze content for accuracy</p>
+        <section id="methods" class="methods">
+            <h2>System Architecture</h2>
+            <div class="method-content">
+                <div class="method-description">
+                    <h3>Our Approach</h3>
+                    <p>The application leverages Artificial Intelligence, Big Data Analytics, and Natural Language Processing (NLP) technologies to provide a robust solution for verifying the accuracy of digital content. The models achieve near-human performance, with the best model reaching 89.90%, particularly in the Support and NEI labels, offering an optimal time-saving potential of approximately 95% compared to humans.</p>
+                    <div class="method-steps">
+                        <div class="method-step">
+                            <h4>1. Evidence Retrieval</h4>
+                            <p>Gemma with SBERT shows optimal K threshold at 5, indicating diminishing returns at higher K values</p>
+                        </div>
+                        <div class="method-step">
+                            <h4>2. Multi-evidence Processing</h4>
+                            <p>Gemma effectively evaluates data and NEI label, with potential performance gains through better evidence retrieval</p>
+                        </div>
+                        <div class="method-step">
+                            <h4>3. Model Training</h4>
+                            <p>Fine-tuning and prompting techniques on pre-trained and large language models</p>
+                        </div>
+                        <div class="method-step">
+                            <h4>4. Evaluation</h4>
+                            <p>Comprehensive evaluation across multiple metrics and domains</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="feature-card">
-                    <i class="fas fa-check-circle"></i>
-                    <h3>Real-time Verification</h3>
-                    <p>Instant fact-checking results</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-database"></i>
-                    <h3>Reliable Sources</h3>
-                    <p>Cross-reference with trusted databases</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="how-it-works" class="how-it-works">
-            <h2>How It Works</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Submit Content</h3>
-                    <p>Enter the text or URL you want to verify</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>AI Analysis</h3>
-                    <p>Our AI analyzes the content</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Get Results</h3>
-                    <p>Receive detailed fact-checking report</p>
+                <div class="method-diagram">
+                    <canvas id="methodChart"></canvas>
                 </div>
             </div>
         </section>
 
-        <section id="about" class="about">
-            <h2>About VifactCheck</h2>
-            <p>VifactCheck is a cutting-edge fact-checking platform that uses artificial intelligence to help users verify information quickly and accurately.</p>
+        <section id="results" class="results">
+            <h2>Results</h2>
+            <div class="results-content">
+                <div class="results-table">
+                    <h3>Detailed Performance Metrics</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Context Accuracy</th>
+                                <th>Evidence Accuracy</th>
+                                <th>F1-Score</th>
+                                <th>Training Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Gemma</td>
+                                <td>85.94%</td>
+                                <td>89.90%</td>
+                                <td>89.90%</td>
+                                <td>1.0h/epoch</td>
+                            </tr>
+                            <tr>
+                                <td>Gemini</td>
+                                <td>84.50%</td>
+                                <td>87.30%</td>
+                                <td>87.30%</td>
+                                <td>API-based</td>
+                            </tr>
+                            <tr>
+                                <td>PhoBERTlarge</td>
+                                <td>83.20%</td>
+                                <td>85.20%</td>
+                                <td>85.10%</td>
+                                <td>0.1h/epoch</td>
+                            </tr>
+                            <tr>
+                                <td>XLM-Rlarge</td>
+                                <td>82.50%</td>
+                                <td>84.50%</td>
+                                <td>84.30%</td>
+                                <td>0.1h/epoch</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </section>
 
-        <section id="contact" class="contact">
-            <h2>Contact Us</h2>
-            <form class="contact-form">
-                <input type="text" placeholder="Name" required>
-                <input type="email" placeholder="Email" required>
-                <textarea placeholder="Message" required></textarea>
-                <button type="submit">Send Message</button>
-            </form>
+        <section id="analysis" class="analysis">
+            <h2>Analysis</h2>
+            <div class="analysis-content">
+                <div class="analysis-charts">
+                    <div class="chart-container">
+                        <h3>Model Performance Comparison</h3>
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Evidence Retrieval Impact</h3>
+                        <canvas id="evidenceChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Performance Across Topics</h3>
+                        <canvas id="topicsChart"></canvas>
+                    </div>
+                    <div class="chart-container full-width">
+                        <h3>Performance by Text Length</h3>
+                        <canvas id="lengthChart"></canvas>
+                    </div>
+                </div>
+                <div class="error-analysis">
+                    <h3>Qualitative Error Analysis</h3>
+                    <p>Two prevalent error types were identified:</p>
+                    <ul>
+                        <li><strong>Complex Inferential Chains:</strong> Models struggle with multi-step reasoning requiring deep understanding</li>
+                        <li><strong>Semantic Ambiguity:</strong> Challenges in disambiguating context-dependent meanings</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="citation" class="citation">
+            <h2>Citation</h2>
+            <div class="citation-content">
+                <pre><code>@inproceedings{hoa2025vifactcheck,
+  title={ViFactCheck: A New Benchmark Dataset and Methods for Multi-domain News Fact-Checking in Vietnamese},
+  author={Hoa, Tran Thai and Duy, Tran Quang and Tran, Khanh Quoc and Van Nguyen, Kiet},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  url={https://ojs.aaai.org/index.php/AAAI/article/view/32008},
+  DOI={10.1609/aaai.v39i1.32008},
+  volume={39},
+  number={1},
+  pages={308--316},
+  year={2025}
+}</code></pre>
+            </div>
         </section>
     </main>
 
     <footer>
         <div class="footer-content">
-            <div class="footer-section">
-                <h3>VifactCheck</h3>
-                <p>Making fact-checking accessible to everyone</p>
-            </div>
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
-            </div>
-            <div class="footer-section">
-                <h3>Connect With Us</h3>
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-linkedin"></i></a>
-                    <a href="#"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 VifactCheck. All rights reserved.</p>
+            <p></p>
         </div>
     </footer>
 
