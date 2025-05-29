@@ -6,28 +6,229 @@
     <title>VifactCheck - Fact Checking Platform</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo">
-                <h1>VifactCheck</h1>
-            </div>
-            <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How It Works</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
-            </div>
-        </nav>
-    </header>
+    <!-- <header>
+        <div class="logo">
+            <h1>ViFactCheck</h1>
+        </div>
+    </header> -->
+
+    <aside class="sidebar-nav">
+        <ul>
+            <li><a href="#demo">Demo</a></li>
+            <li><a href="#analysis">Analysis</a></li>
+            <li><a href="#leaderboard">Performance</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#citation">Citation</a></li>
+        </ul>
+    </aside>
+
+    <!-- OctoTools-style Hero Section -->
+    <section class="octo-hero">
+        <div class="octo-logo-title">
+            <!-- <img src="logo.png" alt="ViFactCheck Logo" class="octo-logo" /> -->
+            <span class="octo-title"><span class="octo-red">ViFact</span><span class="octo-blue">Check</span></span>
+        </div>
+        <div class="octo-subtitle">
+            An Agentic Benchmark & Methods for Multi-domain News Fact-Checking in Vietnamese
+        </div>
+        <div class="octo-authors">
+            <a href="mailto:tranthaihoa@hcmus.edu.vn">Thai-Hoa Tran <i class="fas fa-envelope"></i></a>,
+            <a href="mailto:quangduy@hcmus.edu.vn">Quang-Duy Tran <i class="fas fa-envelope"></i></a>,
+            <a href="mailto:khanhquoc@hcmus.edu.vn">Khanh Quoc Tran <i class="fas fa-envelope"></i></a>,
+            <a href="mailto:kietnv@hcmus.edu.vn">Kiet Van Nguyen <i class="fas fa-envelope"></i></a>
+        </div>
+        <div class="octo-institution">University of Science, VNU-HCM</div>
+        <div class="octo-equal">* <b>Equal Contribution</b></div>
+        <div class="octo-links">
+            <a href="https://arxiv.org/html/2412.15308v1" class="octo-link"><i class="fas fa-file-alt"></i> arXiv</a>
+            <a href="https://github.com/QuangDiy/ViFactCheck" class="octo-link"><i class="fas fa-code"></i> Code</a>
+            <a href="#demo" class="octo-link"><i class="fas fa-rocket"></i> Demo</a>
+            <a href="#leaderboard" class="octo-link"><i class="fas fa-trophy"></i> Leaderboard</a>
+            <a href="#visualize" class="octo-link"><i class="fas fa-chart-bar"></i> Visualize</a>
+            <a href="https://twitter.com" class="octo-link"><i class="fab fa-twitter"></i> Twitter</a>
+        </div>
+    </section>
 
     <main>
-        <section class="hero">
+        <!-- <section class="hero">
             <div class="hero-content">
-                <h1>AI-Powered Fact Checking</h1>
-                <p>Verify information with confidence using our advanced fact-checking platform</p>
-                <button class="cta-button">Get Started</button>
+                <h1>ViFactCheck</h1>
+                <h2>Multi-domain News Fact-Checking in Vietnamese</h2>
+                <p>The first publicly available benchmark dataset for Vietnamese fact-checking across multiple online news domains, achieving 89.90% macro F1 score with state-of-the-art models.</p>
+                <div class="hero-buttons">
+                    <button class="cta-button primary">Get Started</button>
+                    <button class="cta-button secondary">Try Demo</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">7,232</span>
+                        <span class="stat-label">Annotated Claims</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">12</span>
+                        <span class="stat-label">News Domains</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">0.83</span>
+                        <span class="stat-label">Kappa Score</span>
+                    </div>
+                </div>
+            </div>
+        </section> -->
+
+        <section id="demo" class="demo">
+            <h2>See VifactCheck in Action</h2>
+            <div class="demo-container">
+                <div class="demo-input">
+                    <h3>Input</h3>
+                    <textarea placeholder="Enter text or URL to verify..."></textarea>
+                    <button class="analyze-button">Analyze</button>
+                </div>
+                <div class="demo-output">
+                    <h3>Results</h3>
+                    <div class="result-card">
+                        <div class="result-header">
+                            <span class="status verified">Verified</span>
+                            <span class="confidence">95% Confidence</span>
+                        </div>
+                        <div class="result-content">
+                            <p>Sample analysis will appear here...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="analysis" class="analysis-download">
+            <h2>Analysis & Download</h2>
+            <div class="analysis-summary">
+                <div class="analysis-stats">
+                    <div class="stat-block">
+                        <span class="stat-number">12,345</span>
+                        <span class="stat-label">Total Checks</span>
+                    </div>
+                    <div class="stat-block">
+                        <span class="stat-number">97%</span>
+                        <span class="stat-label">Verified Accurate</span>
+                    </div>
+                    <div class="stat-block">
+                        <span class="stat-number">3%</span>
+                        <span class="stat-label">Flagged as False</span>
+                    </div>
+                </div>
+                <div class="analysis-chart">
+                    <!-- Chart.js canvases for analysis charts -->
+                    <div class="chart-grid">
+                        <div class="chart-item">
+                            <canvas id="analysisPieChart" width="300" height="200"></canvas>
+                            <div class="chart-label">Verified vs False (Pie)</div>
+                        </div>
+                        <div class="chart-item">
+                            <canvas id="analysisBarChart" width="300" height="200"></canvas>
+                            <div class="chart-label">Checks Over Time (Bar)</div>
+                        </div>
+                        <div class="chart-item">
+                            <canvas id="analysisDoughnutChart" width="300" height="200"></canvas>
+                            <div class="chart-label">Source Distribution (Doughnut)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="download-area">
+                    <button class="download-button" id="download-data">Download Data (CSV)</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="leaderboard" class="leaderboard">
+            <h2>State-of-the-Art Performance</h2>
+            <div class="leaderboard-container">
+                <div class="leaderboard-header">
+                    <h3>Model Performance Comparison</h3>
+                    <p>Results on ViFactCheck Dataset</p>
+                </div>
+                <div class="leaderboard-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Macro F1</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>Training Time/epoch</th>
+                                <th>Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="top-performer">
+                                <td>Gemma</td>
+                                <td>89.90%</td>
+                                <td>90.15%</td>
+                                <td>89.65%</td>
+                                <td>1.0h</td>
+                                <td>Fine-tuning</td>
+                            </tr>
+                            <tr>
+                                <td>Gemini</td>
+                                <td>87.45%</td>
+                                <td>87.80%</td>
+                                <td>87.10%</td>
+                                <td>N/A</td>
+                                <td>In-context Learning</td>
+                            </tr>
+                            <tr>
+                                <td>PhoBERTlarge</td>
+                                <td>85.32%</td>
+                                <td>85.50%</td>
+                                <td>85.14%</td>
+                                <td>0.1h</td>
+                                <td>Fine-tuning</td>
+                            </tr>
+                            <tr>
+                                <td>XLM-Rlarge</td>
+                                <td>84.78%</td>
+                                <td>84.90%</td>
+                                <td>84.66%</td>
+                                <td>0.1h</td>
+                                <td>Fine-tuning</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="performance-notes">
+                    <p>* Training time measured with Full Context (FC) setting</p>
+                    <p>* All models evaluated on the same test set of 1,000 examples</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="citation" class="citation">
+            <h2>Cite This Work</h2>
+            <div class="citation-container">
+                <div class="citation-format">
+                    <h4>BibTeX</h4>
+                    <div class="citation-text">
+                        <pre>@article{tran2024vifactcheck,
+    author = {Tran, Thai-Hoa and Tran, Quang-Duy and Tran, Khanh Quoc and Nguyen, Kiet Van},
+    title = {ViFactCheck: A New Benchmark Dataset and Methods for Multi-domain News Fact-Checking in Vietnamese},
+    journal = {arXiv preprint},
+    year = {2024},
+    volume = {2412.15308}
+}</pre>
+                    </div>
+                    <button class="copy-button" data-format="bibtex">Copy BibTeX</button>
+                </div>
+                <div class="citation-links">
+                    <a href="https://arxiv.org/html/2412.15308v1" class="citation-link">
+                        <i class="fas fa-external-link-alt"></i> View Paper
+                    </a>
+                    <a href="https://github.com/QuangDiy/ViFactCheck" class="citation-link">
+                        <i class="fas fa-code"></i> GitHub Repository
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -35,19 +236,44 @@
             <h2>Key Features</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <i class="fas fa-robot"></i>
-                    <h3>AI Analysis</h3>
-                    <p>Advanced AI algorithms analyze content for accuracy</p>
-                </div>
-                <div class="feature-card">
-                    <i class="fas fa-check-circle"></i>
-                    <h3>Real-time Verification</h3>
-                    <p>Instant fact-checking results</p>
-                </div>
-                <div class="feature-card">
                     <i class="fas fa-database"></i>
-                    <h3>Reliable Sources</h3>
-                    <p>Cross-reference with trusted databases</p>
+                    <h3>Comprehensive Dataset</h3>
+                    <p>7,232 human-annotated claim-evidence pairs from reputable Vietnamese online news sources</p>
+                    <ul class="feature-list">
+                        <li>12 Diverse Topics</li>
+                        <li>High-Quality Annotations</li>
+                        <li>Multiple Evidence Sources</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-robot"></i>
+                    <h3>Advanced Models</h3>
+                    <p>State-of-the-art pre-trained and large language models for accurate fact-checking</p>
+                    <ul class="feature-list">
+                        <li>Gemma Model Integration</li>
+                        <li>Fine-tuning Capabilities</li>
+                        <li>In-context Learning</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>High Performance</h3>
+                    <p>Superior accuracy with 89.90% macro F1 score on Vietnamese fact-checking</p>
+                    <ul class="feature-list">
+                        <li>Robust Evaluation</li>
+                        <li>Cross-domain Analysis</li>
+                        <li>Error Analysis</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-code"></i>
+                    <h3>Open Source</h3>
+                    <p>Complete toolkit including dataset, model checkpoints, and source code</p>
+                    <ul class="feature-list">
+                        <li>GitHub Repository</li>
+                        <li>Documentation</li>
+                        <li>API Access</li>
+                    </ul>
                 </div>
             </div>
         </section>
@@ -58,17 +284,17 @@
                 <div class="step">
                     <div class="step-number">1</div>
                     <h3>Submit Content</h3>
-                    <p>Enter the text or URL you want to verify</p>
+                    <p>Enter the text or URL you want to verify. Our system accepts various formats including news articles, social media posts, and general text.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
                     <h3>AI Analysis</h3>
-                    <p>Our AI analyzes the content</p>
+                    <p>Our advanced AI algorithms analyze the content, cross-reference with reliable sources, and check for factual accuracy in real-time.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
                     <h3>Get Results</h3>
-                    <p>Receive detailed fact-checking report</p>
+                    <p>Receive a detailed fact-checking report with confidence scores, source citations, and explanations for each claim.</p>
                 </div>
             </div>
         </section>
@@ -76,16 +302,6 @@
         <section id="about" class="about">
             <h2>About VifactCheck</h2>
             <p>VifactCheck is a cutting-edge fact-checking platform that uses artificial intelligence to help users verify information quickly and accurately.</p>
-        </section>
-
-        <section id="contact" class="contact">
-            <h2>Contact Us</h2>
-            <form class="contact-form">
-                <input type="text" placeholder="Name" required>
-                <input type="email" placeholder="Email" required>
-                <textarea placeholder="Message" required></textarea>
-                <button type="submit">Send Message</button>
-            </form>
         </section>
     </main>
 
@@ -100,7 +316,6 @@
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How It Works</a>
                 <a href="#about">About</a>
-                <a href="#contact">Contact</a>
             </div>
             <div class="footer-section">
                 <h3>Connect With Us</h3>
