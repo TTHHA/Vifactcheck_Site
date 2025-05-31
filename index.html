@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViFactCheck: A New Benchmark Dataset and Methods for Multi-domain News Fact-Checking in Vietnamese</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo-container">
+                <img src="image/Logo_UIT_In.jpg" alt="UIT Logo" class="logo uit-logo">
+                <img src="image/UIT_NLP_LOGO.png" alt="UIT NLP Lab Logo" class="logo nlp-logo">
+                <div class="project-title"><span class="vi">Vi</span><span class="fact">Fact</span><span class="check">Check</span></div>
+            </div>
+            <div class="nav-links">
+                <a href="#abstract">Abstract</a>
+                <a href="#dataset">Dataset</a>
+                <a href="#methods">Methods</a>
+                <a href="#results">Results</a>
+                <a href="#citation">Citation</a>
+            </div>
+        </nav>
+        <div class="paper-header">
+            <h1 class="paper-title">ViFactCheck: A New Benchmark Dataset and Methods for Multi-domain News Fact-Checking in Vietnamese</h1>
+            
+            <div class="authors">
+                <p>Thai-Hoa Tran<sup>1,2</sup>, Quang-Duy Tran<sup>1,2</sup>, Khanh Quoc Tran<sup>1,2</sup>, Kiet Van Nguyen<sup>1,2*</sup></p>
+            </div>
+            
+            <div class="affiliations">
+                <p><sup>1</sup> Faculty of Information Science and Engineering, University of Information Technology</p>
+                <p><sup>2</sup> Vietnam National University, Ho Chi Minh City, Vietnam</p>
+            </div>
+            
+            <div class="contact-info">
+                <a href="mailto:21522082@gm.uit.edu.vn"><i class="fas fa-envelope"></i> 21522082@gm.uit.edu.vn</a>
+                <a href="mailto:20512013@gm.uit.edu.vn"><i class="fas fa-envelope"></i> 20512013@gm.uit.edu.vn</a>
+                <a href="mailto:khanhtq@uit.edu.vn"><i class="fas fa-envelope"></i> khanhtq@uit.edu.vn</a>
+                <a href="mailto:kietnv@uit.edu.vn"><i class="fas fa-envelope"></i> kietnv@uit.edu.vn</a>
+            </div>
+            
+            <div class="paper-links">
+                <a href="https://ojs.aaai.org/index.php/AAAI/article/view/32008" class="paper-link" title="Paper"><i class="fas fa-file-pdf"></i> Paper</a>
+                <a href="https://github.com/TTHHA/ViFactCheck" class="github-link" title="GitHub"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://huggingface.co/collections/tranthaihoa/aaai2025-67f8e7204bbffa951b3ab0b3" class="huggingface-link" title="Hugging Face"><i class="fas fa-robot"></i> Hugging Face</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="abstract">
+            <h2>Abstract</h2>
+            <p>The rapid spread of information in the digital age highlights the critical need for effective fact-checking tools, particularly for languages with limited resources, such as Vietnamese. In response to this challenge, we introduce ViFactCheck, the first publicly available benchmark dataset designed specifically for Vietnamese fact-checking across multiple online news domains. This dataset contains 7,232 human-annotated pairs of claim-evidence combinations sourced from reputable Vietnamese online news, covering 12 diverse topics. It has been subjected to a meticulous annotation process to ensure high quality and reliability, achieving a Fleiss Kappa inter-annotator agreement score of 0.83.</p>
+        </section>
+
+        <section id="dataset" class="dataset">
+            <h2>Dataset & Models</h2>
+            <div class="dataset-content">
+                <div class="dataset-stats">
+                    <div class="stat-card">
+                        <h3>Dataset Size</h3>
+                        <p><b>7,232 Claims</b></p>
+                        <p class="stat-detail">Human-annotated pairs</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Topics</h3>
+                        <p><b>12 Domains</b></p>
+                        <p class="stat-detail">Multi-domain coverage</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Agreement</h3>
+                        <p><b>0.83 Kappa</b></p>
+                        <p class="stat-detail">High reliability</p>
+                    </div>
+                </div>
+                <div class="dataset-details">
+                    <h3>Dataset Creation Process</h3>
+                    <div class="method-steps">
+                        <img src="image\dataset.jpg" alt="Dataset Creation Process" class="pdf-image">
+                    </div>
+
+                    <h3>Available Models</h3>
+                    <div class="model-categories">
+                        <div class="model-category">
+                            <h4>Pre-trained Models</h4>
+                            <ul class="model-list">
+                                <li>
+                                    <span>XLM-R</span>
+                                </li>
+                                <li>
+                                    <span>ViBERT</span>
+                                </li>
+                                <li>
+                                    <span>mBERT</span>
+                                </li>
+                                <li>
+                                    <span>PhoBERT</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="model-category">
+                            <h4>Large Language Models</h4>
+                            <ul class="model-list">
+                                <li>
+                                    <img src="image/gemma-logo.png" alt="Gemma Logo" class="model-logo">
+                                    <span>Gemma</span>
+                                </li>
+                                <li>
+                                    <img src="image/gemini-logo.png" alt="Gemini Logo" class="model-logo">
+                                    <span>Gemini</span>
+                                </li>
+                                <li>
+                                    <img src="image/mistral-logo.png" alt="Mistral Logo" class="model-logo">
+                                    <span>Mistral</span>
+                                </li>
+                                <li>
+                                    <img src="image/llama-logo.png" alt="Llama Logo" class="model-logo">
+                                    <span>Llama</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="model-note">All models and dataset are publicly available on Hugging Face. You can access them through our <a href="https://huggingface.co/collections/tranthaihoa/aaai2025-67f8e7204bbffa951b3ab0b3" class="external-link">Hugging Face Collection</a>.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="methods" class="methods">
+            <h2>System Architecture</h2>
+            <div class="method-content">
+                <div class="method-description">
+                    <h3>Our Approach</h3>
+                    <div class="method-steps">
+                        <img src="image/system_ar.jpg" alt="System Architecture" class="pdf-image">
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="results" class="results">
+            <h2>Results</h2>
+            <div class="results-content">
+                <div class="upload-section">
+                    <h3>Submit Your Results</h3>
+                    <form id="resultsUploadForm" enctype="multipart/form-data">
+                        <div class="upload-container">
+                            <div class="form-group">
+                                <label for="teamName">Team Name:</label>
+                                <input type="text" id="teamName" required placeholder="Enter your team name">
+                            </div>
+                            <div class="form-group">
+                                <label for="resultsFile">Results File:</label>
+                                <input type="file" id="resultsFile" accept=".json" required>
+                            </div>
+                            <button type="submit" class="upload-btn">Upload Results</button>
+                        </div>
+                        <p class="upload-note">Please upload your results in JSON format following our template.</p>
+                    </form>
+                </div>
+
+                <div class="results-table">
+                    <h3>Leaderboard</h3>
+                    <div class="table-controls">
+                        <select id="sortBy">
+                            <option value="fullContext">Sort by Full Context</option>
+                            <option value="goldEvidence">Sort by Gold Evidence</option>
+                            <option value="delta">Sort by Improvement</option>
+                        </select>
+                        <button id="refreshLeaderboard" class="refresh-btn">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <table id="leaderboardTable">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Team</th>
+                                <th>Model</th>
+                                <th>Full Context</th>
+                                <th>Gold Evidence</th>
+                                <th>Δ</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody">
+                            <!-- Dynamic content will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="analysis" class="analysis">
+            <h2>Analysis</h2>
+            <div class="analysis-content">
+                <div class="analysis-charts">
+                    <div class="chart-container">
+                        <h3>Model Performance Comparison</h3>
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Evidence Retrieval Impact</h3>
+                        <canvas id="evidenceChart"></canvas>
+                    </div>
+                    <div class="chart-container full-width">
+                        <h3>Performance Across Topics</h3>
+                        <canvas id="topicsChart"></canvas>
+                    </div>
+                    <div class="chart-container full-width">
+                        <h3>Performance by Text Length</h3>
+                        <canvas id="lengthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="citation" class="citation">
+            <h2>Citation</h2>
+            <div class="citation-content">
+                <pre><code>@inproceedings{hoa2025vifactcheck,
+  title={ViFactCheck: A New Benchmark Dataset and Methods for Multi-domain News Fact-Checking in Vietnamese},
+  author={Hoa, Tran Thai and Duy, Tran Quang and Tran, Khanh Quoc and Van Nguyen, Kiet},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  url={https://ojs.aaai.org/index.php/AAAI/article/view/32008},
+  DOI={10.1609/aaai.v39i1.32008},
+  volume={39},
+  number={1},
+  pages={308--316},
+  year={2025}
+}</code></pre>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 ViFactCheck. All rights reserved. Developed by ViFactCheck Team.</p>
+        </div>
+    </footer>
+
+    <script src="server.static.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
