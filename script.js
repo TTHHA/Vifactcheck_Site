@@ -462,4 +462,223 @@ statCards.forEach(card => {
     card.style.transform = 'translateY(20px)';
     card.style.transition = 'all 0.5s ease-out';
     observer.observe(card);
+});
+
+// Leaderboard functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const resultsUploadForm = document.getElementById('resultsUploadForm');
+    const sortBySelect = document.getElementById('sortBy');
+    const refreshButton = document.getElementById('refreshLeaderboard');
+    const leaderboardBody = document.getElementById('leaderboardBody');
+
+    // Check if we're running on GitHub Pages
+    const isGitHubPages = window.location.hostname.includes('github.io');
+
+    // Load initial leaderboard data
+    loadLeaderboard();
+
+    // Handle file upload
+    resultsUploadForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('resultsFile');
+        const teamNameInput = document.getElementById('teamName');
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            alert('Please select a file to upload');
+            return;
+        }
+
+        if (!teamNameInput.value.trim()) {
+            alert('Please enter your team name');
+            return;
+        }
+
+        if (isGitHubPages) {
+            // Handle upload for GitHub Pages version
+            try {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const results = JSON.parse(e.target.result);
+                        
+                        // Validate the results format
+                        if (!results.model) {
+                            throw new Error('Model name is required in the JSON file');
+                        }
+                        if (typeof results.fullContext !== 'number') {
+                            throw new Error('fullContext must be a number in the JSON file');
+                        }
+                        if (typeof results.goldEvidence !== 'number') {
+                            throw new Error('goldEvidence must be a number in the JSON file');
+                        }
+
+                        // Add team name and current date
+                        results.team = teamNameInput.value.trim();
+                        results.date = new Date().toISOString().split('T')[0];
+
+                        // Get current data
+                        const currentData = window.leaderboardAPI.loadData();
+                        
+                        // Add new results
+                        currentData.push(results);
+                        
+                        // Save updated data
+                        window.leaderboardAPI.saveData(currentData);
+
+                        alert('Results uploaded successfully!');
+                        loadLeaderboard(sortBySelect.value);
+                        fileInput.value = '';
+                        teamNameInput.value = '';
+                    } catch (error) {
+                        alert('Error processing file: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            } catch (error) {
+                alert('Error reading file: ' + error.message);
+            }
+        } else {
+            // Handle upload for Node.js version
+            const formData = new FormData();
+            formData.append('results', file);
+            formData.append('teamName', teamNameInput.value.trim());
+
+            try {
+                const response = await fetch('/api/upload-results', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.details || result.message || 'Upload failed');
+                }
+
+                alert('Results uploaded successfully!');
+                loadLeaderboard(sortBySelect.value);
+                fileInput.value = '';
+                teamNameInput.value = '';
+            } catch (error) {
+                alert('Error uploading results: ' + error.message);
+            }
+        }
+    });
+
+    // Handle sorting
+    sortBySelect.addEventListener('change', function() {
+        loadLeaderboard(this.value);
+    });
+
+    // Handle refresh
+    refreshButton.addEventListener('click', function() {
+        loadLeaderboard(sortBySelect.value);
+    });
+
+    // Function to load leaderboard data
+    async function loadLeaderboard(sortBy = 'fullContext') {
+        try {
+            let data;
+            
+            if (isGitHubPages) {
+                // Load data from localStorage for GitHub Pages version
+                data = window.leaderboardAPI.loadData();
+            } else {
+                // Load data from server for Node.js version
+                const response = await fetch(`/api/leaderboard?sortBy=${sortBy}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load leaderboard');
+                }
+                data = await response.json();
+            }
+
+            if (!Array.isArray(data)) {
+                console.error('Invalid data format received:', data);
+                return;
+            }
+
+            // Sort the data
+            data.sort((a, b) => {
+                if (sortBy === 'delta') {
+                    const deltaA = a.goldEvidence - a.fullContext;
+                    const deltaB = b.goldEvidence - b.fullContext;
+                    return deltaB - deltaA;
+                }
+                return b[sortBy] - a[sortBy];
+            });
+
+            updateLeaderboard(data);
+        } catch (error) {
+            console.error('Error loading leaderboard:', error);
+            alert('Error loading leaderboard data: ' + error.message);
+        }
+    }
+
+    // Function to update the leaderboard table
+    function updateLeaderboard(data) {
+        if (!leaderboardBody) {
+            console.error('Leaderboard body element not found');
+            return;
+        }
+
+        leaderboardBody.innerHTML = '';
+        
+        if (data.length === 0) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 7;
+            cell.textContent = 'No data available';
+            cell.style.textAlign = 'center';
+            row.appendChild(cell);
+            leaderboardBody.appendChild(row);
+            return;
+        }
+        
+        data.forEach((entry, index) => {
+            const row = document.createElement('tr');
+            
+            // Add rank
+            const rankCell = document.createElement('td');
+            rankCell.textContent = index + 1;
+            row.appendChild(rankCell);
+
+            // Add team name
+            const teamCell = document.createElement('td');
+            teamCell.textContent = entry.team || 'Unknown Team';
+            row.appendChild(teamCell);
+
+            // Add model name
+            const modelCell = document.createElement('td');
+            modelCell.textContent = entry.model || 'Unknown Model';
+            row.appendChild(modelCell);
+
+            // Add full context score
+            const fullContextCell = document.createElement('td');
+            fullContextCell.textContent = (entry.fullContext || 0).toFixed(2);
+            row.appendChild(fullContextCell);
+
+            // Add gold evidence score
+            const goldEvidenceCell = document.createElement('td');
+            goldEvidenceCell.textContent = (entry.goldEvidence || 0).toFixed(2);
+            row.appendChild(goldEvidenceCell);
+
+            // Add delta
+            const deltaCell = document.createElement('td');
+            const delta = (entry.goldEvidence || 0) - (entry.fullContext || 0);
+            deltaCell.style.color = delta >= 0 ? 'blue' : 'red';
+            deltaCell.textContent = (delta >= 0 ? '↑' : '↓') + Math.abs(delta).toFixed(2);
+            row.appendChild(deltaCell);
+
+            // Add date
+            const dateCell = document.createElement('td');
+            dateCell.textContent = entry.date ? new Date(entry.date).toLocaleDateString() : 'N/A';
+            row.appendChild(dateCell);
+
+            leaderboardBody.appendChild(row);
+        });
+    }
+
+    // Initial load
+    loadLeaderboard(sortBySelect.value);
 }); 

@@ -1,0 +1,69 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # or master, depending on your default branch name
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required for GitHub Pages deployment
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build
+        run: |
+          # Create dist directory
+          mkdir -p dist
+          
+          # Copy static files
+          cp -r index.html styles.css script.js server.static.js dist/
+          
+          # Copy images directory if it exists
+          if [ -d "image" ]; then
+            cp -r image dist/
+          fi
+          
+          # Create data directory and copy leaderboard data
+          mkdir -p dist/data
+          if [ -f "data/leaderboard-data.json" ]; then
+            cp data/leaderboard-data.json dist/data/
+          else
+            # Create initial data file if it doesn't exist
+            echo '[
+              { "team": "Baseline", "model": "Gemma", "fullContext": 85.94, "goldEvidence": 89.90, "date": "2024-03-20" }
+            ]' > dist/data/leaderboard-data.json
+          fi
+          
+          # Create a simple server.js for GitHub Pages
+          echo "// This is a static version of the site" > dist/server.js
+          
+          # Create a simple package.json
+          echo '{
+            "name": "vifactcheck-static",
+            "version": "1.0.0",
+            "private": true,
+            "description": "ViFactCheck Leaderboard - Static Version"
+          }' > dist/package.json
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
+          branch: gh-pages
+          clean: true  # Clean the deployment branch before deploying
+          commit-message: "Deploy website - ${{ github.event.head_commit.message }}" 
