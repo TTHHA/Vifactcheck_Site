@@ -2,7 +2,6 @@ const express = require('express');
 const multer = require('multer');
 const supabase = require('./supabase');
 const app = express();
-const port = 3000;
 
 // Configure multer for file upload
 const storage = multer.memoryStorage();
@@ -18,6 +17,12 @@ const upload = multer({
 
 // Serve static files
 app.use(express.static('.'));
+
+// Helper function to ensure numeric values
+function ensureNumeric(value) {
+    const num = parseFloat(value);
+    return isNaN(num) ? 0 : num;
+}
 
 // Load leaderboard data from Supabase
 async function loadData() {
@@ -49,9 +54,17 @@ async function loadData() {
 // Save data to Supabase
 async function saveData(data) {
     try {
+        // Ensure numeric values before saving
+        const processedData = {
+            ...data,
+            fullContext: ensureNumeric(data.fullContext),
+            goldEvidence: ensureNumeric(data.goldEvidence),
+            delta: ensureNumeric(data.goldEvidence) - ensureNumeric(data.fullContext)
+        };
+
         const { error } = await supabase
             .from('leaderboard')
-            .insert(data);
+            .insert(processedData);
 
         if (error) throw error;
     } catch (error) {
@@ -88,12 +101,11 @@ app.post('/api/upload-results', upload.single('results'), async (req, res) => {
         if (!results.model) {
             return res.status(400).json({ message: 'Model name is required in the JSON file' });
         }
-        if (typeof results.fullContext !== 'number') {
-            return res.status(400).json({ message: 'fullContext must be a number in the JSON file' });
-        }
-        if (typeof results.goldEvidence !== 'number') {
-            return res.status(400).json({ message: 'goldEvidence must be a number in the JSON file' });
-        }
+        
+        // Ensure numeric values
+        results.fullContext = ensureNumeric(results.fullContext);
+        results.goldEvidence = ensureNumeric(results.goldEvidence);
+        results.delta = results.goldEvidence - results.fullContext;
 
         // Add team name and current date
         results.team = teamName;
@@ -123,22 +135,24 @@ app.get('/api/leaderboard', async (req, res) => {
         // Sort the data
         const sortedData = [...data].sort((a, b) => {
             if (sortBy === 'delta') {
-                const deltaA = (a.goldEvidence || 0) - (a.fullContext || 0);
-                const deltaB = (b.goldEvidence || 0) - (b.fullContext || 0);
-                return deltaB - deltaA;
+                return b.delta - a.delta;
             }
             return (b[sortBy] || 0) - (a[sortBy] || 0);
         });
 
         res.json(sortedData);
     } catch (error) {
-        // console.error('Error getting leaderboard data:', error);
-        // Return empty array instead of error
         res.json([]);
     }
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-}); 
+// For Vercel serverless functions
+if (process.env.NODE_ENV === 'production') {
+    module.exports = app;
+} else {
+    // For local development
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+} 

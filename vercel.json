@@ -24,8 +24,14 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "server.js"
+      "src": "/api/upload-results",
+      "dest": "server.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/api/leaderboard",
+      "dest": "server.js",
+      "methods": ["GET"]
     },
     {
       "src": "/(.*)",
