@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
+      "src": "api/**/*.js",
       "use": "@vercel/node"
     },
     {
@@ -25,13 +25,11 @@
   "routes": [
     {
       "src": "/api/upload-results",
-      "dest": "server.js",
-      "methods": ["POST"]
+      "dest": "/api/upload-results.js"
     },
     {
       "src": "/api/leaderboard",
-      "dest": "server.js",
-      "methods": ["GET"]
+      "dest": "/api/leaderboard.js"
     },
     {
       "src": "/(.*)",
