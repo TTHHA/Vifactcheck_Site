@@ -1,5 +1,9 @@
-const express = require('express');
-const supabase = require('../supabase');
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Helper function to ensure numeric values
 function ensureNumeric(value) {
@@ -35,6 +39,26 @@ async function loadData() {
 }
 
 module.exports = async (req, res) => {
+    // Enable CORS
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    );
+
+    // Handle OPTIONS request
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
+    // Only allow GET requests
+    if (req.method !== 'GET') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
     try {
         const sortBy = req.query.sortBy || 'fullContext';
         
@@ -51,6 +75,7 @@ module.exports = async (req, res) => {
 
         res.json(sortedData);
     } catch (error) {
-        res.json([]);
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 }; 
