@@ -34,33 +34,73 @@ jobs:
           mkdir -p dist
           
           # Copy static files
-          cp -r index.html styles.css script.js server.static.js dist/
+          cp -r index.html styles.css script.js dist/
           
           # Copy images directory if it exists
           if [ -d "image" ]; then
             cp -r image dist/
           fi
           
-          # Create data directory and copy leaderboard data
-          mkdir -p dist/data
-          if [ -f "data/leaderboard-data.json" ]; then
-            cp data/leaderboard-data.json dist/data/
-          else
-            # Create initial data file if it doesn't exist
-            echo '[
-              { "team": "Baseline", "model": "Gemma", "fullContext": 85.94, "goldEvidence": 89.90, "date": "2024-03-20" }
-            ]' > dist/data/leaderboard-data.json
-          fi
+          # Create a production version of supabase.js
+          echo "const { createClient } = require('@supabase/supabase-js');
           
-          # Create a simple server.js for GitHub Pages
-          echo "// This is a static version of the site" > dist/server.js
+          const supabaseUrl = '${{ secrets.SUPABASE_URL }}';
+          const supabaseKey = '${{ secrets.SUPABASE_ANON_KEY }}';
           
-          # Create a simple package.json
+          const supabase = createClient(supabaseUrl, supabaseKey);
+          
+          module.exports = supabase;" > dist/supabase.js
+          
+          # Create a production version of server.js
+          echo "const express = require('express');
+          const supabase = require('./supabase');
+          const app = express();
+          
+          app.use(express.static('.'));
+          
+          // API endpoint to get leaderboard data
+          app.get('/api/leaderboard', async (req, res) => {
+              try {
+                  const { data, error } = await supabase
+                      .from('leaderboard')
+                      .select('*')
+                      .order('fullContext', { ascending: false });
+                  
+                  if (error) throw error;
+                  
+                  // Filter out entries with null or invalid values
+                  const validData = (data || []).filter(entry => 
+                      entry && 
+                      entry.team && 
+                      entry.model && 
+                      typeof entry.fullContext === 'number' && 
+                      typeof entry.goldEvidence === 'number'
+                  );
+                  
+                  res.json(validData);
+              } catch (error) {
+                  res.json([]);
+              }
+          });
+          
+          const port = process.env.PORT || 3000;
+          app.listen(port, () => {
+              console.log(\`Server running on port \${port}\`);
+          });" > dist/server.js
+          
+          # Create package.json with all required dependencies
           echo '{
             "name": "vifactcheck-static",
             "version": "1.0.0",
             "private": true,
-            "description": "ViFactCheck Leaderboard - Static Version"
+            "description": "ViFactCheck Leaderboard - Static Version",
+            "dependencies": {
+              "@supabase/supabase-js": "^2.39.7",
+              "express": "^4.18.2"
+            },
+            "engines": {
+              "node": ">=14.0.0"
+            }
           }' > dist/package.json
 
       - name: Deploy
