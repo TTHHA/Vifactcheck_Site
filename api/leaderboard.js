@@ -24,14 +24,17 @@ async function loadData() {
             return [];
         }
 
-        // Filter out entries with null or invalid values
+        // Filter out entries with null or invalid values and calculate delta
         return (data || []).filter(entry => 
             entry && 
             entry.team && 
             entry.model && 
             typeof entry.fullContext === 'number' && 
             typeof entry.goldEvidence === 'number'
-        );
+        ).map(entry => ({
+            ...entry,
+            delta: entry.goldEvidence - entry.fullContext
+        }));
     } catch (error) {
         console.error('Error loading data:', error);
         return [];

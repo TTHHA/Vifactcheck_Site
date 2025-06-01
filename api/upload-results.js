@@ -32,8 +32,7 @@ async function saveData(data) {
         const processedData = {
             ...data,
             fullContext: ensureNumeric(data.fullContext),
-            goldEvidence: ensureNumeric(data.goldEvidence),
-            delta: ensureNumeric(data.goldEvidence) - ensureNumeric(data.fullContext)
+            goldEvidence: ensureNumeric(data.goldEvidence)
         };
 
         const { error } = await supabase
@@ -114,7 +113,6 @@ module.exports = async (req, res) => {
         // Ensure numeric values
         results.fullContext = ensureNumeric(results.fullContext);
         results.goldEvidence = ensureNumeric(results.goldEvidence);
-        results.delta = results.goldEvidence - results.fullContext;
 
         // Add team name and current date
         results.team = teamName;
