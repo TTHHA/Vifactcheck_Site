@@ -76,4 +76,5 @@ lib-cov
 .Trashes
 ehthumbs.db
 Thumbs.db
-    
+
+vercel.json
