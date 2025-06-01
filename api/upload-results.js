@@ -2,10 +2,35 @@ const { createClient } = require('@supabase/supabase-js');
 const multer = require('multer');
 const { Readable } = require('stream');
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Database configuration and initialization
+const DB_CONFIG = {
+    maxRetries: 3,
+    retryDelay: 1000, // 1 second
+    connectionTimeout: 5000, // 5 seconds
+};
+
+// Initialize Supabase client with error handling
+let supabase;
+try {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Missing Supabase credentials');
+    }
+    
+    supabase = createClient(supabaseUrl, supabaseKey, {
+        auth: {
+            persistSession: false
+        },
+        db: {
+            schema: 'public'
+        }
+    });
+} catch (error) {
+    console.error('Failed to initialize Supabase client:', error);
+    process.exit(1);
+}
 
 // Configure multer for file upload
 const storage = multer.memoryStorage();
@@ -19,25 +44,49 @@ const upload = multer({
     }
 });
 
-// Helper function to ensure numeric values
-function ensureNumeric(value) {
-    const num = parseFloat(value);
-    return isNaN(num) ? 0 : num;
+// Database helper functions
+async function retryOperation(operation, maxRetries = DB_CONFIG.maxRetries) {
+    let lastError;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            return await operation();
+        } catch (error) {
+            lastError = error;
+            if (i < maxRetries - 1) {
+                await new Promise(resolve => setTimeout(resolve, DB_CONFIG.retryDelay));
+            }
+        }
+    }
+    throw lastError;
+}
+
+// Validate leaderboard entry
+function validateLeaderboardEntry(entry) {
+    const requiredFields = ['team', 'model', 'fullContext', 'goldEvidence'];
+    const missingFields = requiredFields.filter(field => !entry[field]);
+    
+    if (missingFields.length > 0) {
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    }
+    
+    if (typeof entry.fullContext !== 'number' || typeof entry.goldEvidence !== 'number') {
+        throw new Error('fullContext and goldEvidence must be numbers');
+    }
+    
+    return true;
 }
 
 // Save data to Supabase
 async function saveData(data) {
     try {
-        // Ensure numeric values before saving
-        const processedData = {
-            ...data,
-            fullContext: ensureNumeric(data.fullContext),
-            goldEvidence: ensureNumeric(data.goldEvidence)
-        };
+        // Validate the data
+        validateLeaderboardEntry(data);
 
-        const { error } = await supabase
-            .from('leaderboard')
-            .insert(processedData);
+        const { error } = await retryOperation(async () => {
+            return await supabase
+                .from('leaderboard')
+                .insert(data);
+        });
 
         if (error) throw error;
     } catch (error) {
@@ -63,7 +112,7 @@ module.exports = async (req, res) => {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
     res.setHeader(
         'Access-Control-Allow-Headers',
         'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
@@ -105,15 +154,6 @@ module.exports = async (req, res) => {
             });
         }
         
-        // Validate the results format
-        if (!results.model) {
-            return res.status(400).json({ message: 'Model name is required in the JSON file' });
-        }
-        
-        // Ensure numeric values
-        results.fullContext = ensureNumeric(results.fullContext);
-        results.goldEvidence = ensureNumeric(results.goldEvidence);
-
         // Add team name and current date
         results.team = teamName;
         results.date = new Date().toISOString().split('T')[0];
