@@ -1,4 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
+const express = require('express');
+const fs = require('fs');
+const app = express();
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -40,6 +43,43 @@ async function loadData() {
         return [];
     }
 }
+
+// Load ground truth once at startup
+const groundTruth = {}; // { id: label }
+const gtData = JSON.parse(fs.readFileSync('ground_truth.json', 'utf8'));
+gtData.forEach(row => {
+  groundTruth[row.id] = row.label;
+});
+
+function calculateF1(yTrue, yPred, label) {
+  let tp = 0, fp = 0, fn = 0;
+  for (let i = 0; i < yTrue.length; i++) {
+    if (yPred[i] === label && yTrue[i] === label) tp++;
+    if (yPred[i] === label && yTrue[i] !== label) fp++;
+    if (yPred[i] !== label && yTrue[i] === label) fn++;
+  }
+  const precision = tp / (tp + fp || 1);
+  const recall = tp / (tp + fn || 1);
+  return 2 * precision * recall / (precision + recall || 1);
+}
+
+app.post('/upload_predictions', (req, res) => {
+  const predictions = req.body; // Array of {id, prediction}
+  const yTrue = [];
+  const yPred = [];
+  predictions.forEach(p => {
+    if (groundTruth[p.id]) {
+      yTrue.push(groundTruth[p.id]);
+      yPred.push(p.prediction);
+    }
+  });
+  const labels = Array.from(new Set([...yTrue, ...yPred]));
+  const f1s = labels.map(label => calculateF1(yTrue, yPred, label));
+  const macroF1 = f1s.reduce((a, b) => a + b, 0) / f1s.length;
+  res.json({ macroF1, perClassF1: Object.fromEntries(labels.map((l, i) => [l, f1s[i]])) });
+});
+
+app.listen(3000, () => console.log('Server started on port 3000'));
 
 module.exports = async (req, res) => {
     // Enable CORS
