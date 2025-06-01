@@ -5,6 +5,10 @@ on:
     branches:
       - main  # or master, depending on your default branch name
   workflow_dispatch:  # Allows manual triggering
+  
+env:
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
 jobs:
   build-and-deploy:
