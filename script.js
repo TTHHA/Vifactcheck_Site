@@ -485,8 +485,28 @@ document.addEventListener('DOMContentLoaded', function() {
         return Number(num).toFixed(2);
     }
 
+    // Function to add loading state
+    function setLoading(isLoading) {
+        if (isLoading) {
+            leaderboardBody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="loading-message">
+                        <div class="loading-spinner"></div>
+                        Loading leaderboard data...
+                    </td>
+                </tr>
+            `;
+            refreshButton.disabled = true;
+            sortBySelect.disabled = true;
+        } else {
+            refreshButton.disabled = false;
+            sortBySelect.disabled = false;
+        }
+    }
+
     // Function to update the leaderboard
     async function updateLeaderboard() {
+        setLoading(true);
         try {
             const sortBy = sortBySelect.value;
             const response = await fetch(`/api/leaderboard?sortBy=${sortBy}`);
@@ -500,36 +520,65 @@ document.addEventListener('DOMContentLoaded', function() {
             // Clear existing table content
             leaderboardBody.innerHTML = '';
 
+            if (data.length === 0) {
+                leaderboardBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-message">
+                            No data available in the leaderboard yet.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
             // Add new rows
             data.forEach((entry, index) => {
                 const row = document.createElement('tr');
+                const delta = entry.delta;
+                const deltaClass = delta > 0 ? 'positive-delta' : delta < 0 ? 'negative-delta' : '';
+                
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${entry.team}</td>
                     <td>${entry.model}</td>
                     <td>${formatNumber(entry.fullContext)}</td>
                     <td>${formatNumber(entry.goldEvidence)}</td>
-                    <td>${formatNumber(entry.delta)}</td>
+                    <td class="${deltaClass}">${delta > 0 ? '+' : ''}${formatNumber(delta)}</td>
                     <td>${formatDate(entry.created_at)}</td>
                 `;
                 leaderboardBody.appendChild(row);
             });
+
         } catch (error) {
             console.error('Error updating leaderboard:', error);
             leaderboardBody.innerHTML = `
                 <tr>
                     <td colspan="7" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
                         Failed to load leaderboard data. Please try again later.
                     </td>
                 </tr>
             `;
+        } finally {
+            setLoading(false);
         }
     }
 
     // Event listeners
     sortBySelect.addEventListener('change', updateLeaderboard);
-    refreshButton.addEventListener('click', updateLeaderboard);
+    refreshButton.addEventListener('click', () => {
+        const icon = refreshButton.querySelector('i');
+        icon.classList.add('rotating');
+        updateLeaderboard().finally(() => {
+            setTimeout(() => {
+                icon.classList.remove('rotating');
+            }, 500);
+        });
+    });
 
     // Initial load
     updateLeaderboard();
-}); 
+
+    // Auto-refresh every 5 minutes
+    setInterval(updateLeaderboard, 5 * 60 * 1000);
+});
