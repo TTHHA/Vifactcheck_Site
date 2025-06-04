@@ -547,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>${formatNumber(entry.fullContext)}</td>
                     <td>${formatNumber(entry.goldEvidence)}</td>
                     <td class="${deltaClass}">${delta > 0 ? '+' : ''}${formatNumber(delta)}</td>
-                    <td>${formatDate(entry.created_at)}</td>
+                    <td>${formatDate(entry.date)}</td>
                 `;
                 leaderboardBody.appendChild(row);
             });
