@@ -712,6 +712,12 @@ h2 {
     white-space: nowrap;
 }
 
+#leaderboardTable th:nth-child(4),
+#leaderboardTable th:nth-child(5),
+#leaderboardTable th:nth-child(6) {
+    text-align: right;
+}
+
 #leaderboardTable td {
     padding: 1rem;
     border-bottom: 1px solid #dee2e6;
