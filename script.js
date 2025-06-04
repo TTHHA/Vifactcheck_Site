@@ -472,7 +472,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to format date
     function formatDate(dateString) {
-        const date = new Date(dateString);
+        if (!dateString) return '-';
+        // Add 'T00:00:00Z' to ensure it's parsed as UTC midnight
+        const date = new Date(dateString.length === 10 ? dateString + 'T00:00:00Z' : dateString);
+        if (isNaN(date.getTime())) return '-';
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
