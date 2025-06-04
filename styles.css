@@ -694,62 +694,112 @@ h2 {
 
 #leaderboardTable {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     margin-top: 1rem;
-    font-size: 0.95rem;
+    font-size: 1rem;
+    background: #fff;
+    table-layout: fixed;
 }
 
-#leaderboardTable thead {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
+#leaderboardTable th, #leaderboardTable td {
+    padding: 0.75rem 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #leaderboardTable th {
-    padding: 1rem;
-    text-align: left;
-    font-weight: 600;
+    background: #f8f9fa;
+    font-weight: 700;
     color: #495057;
-    white-space: nowrap;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 1.05rem;
+}
+
+#leaderboardTable th:nth-child(1), #leaderboardTable td:nth-child(1) {
+    width: 48px;
+    min-width: 40px;
+    max-width: 56px;
+    text-align: center;
+}
+
+#leaderboardTable th:nth-child(2), #leaderboardTable td:nth-child(2) {
+    width: 18%;
+    text-align: left;
+}
+
+#leaderboardTable th:nth-child(3), #leaderboardTable td:nth-child(3) {
+    width: 18%;
+    text-align: left;
 }
 
 #leaderboardTable th:nth-child(4),
 #leaderboardTable th:nth-child(5),
-#leaderboardTable th:nth-child(6) {
+#leaderboardTable th:nth-child(6),
+#leaderboardTable th:nth-child(7),
+#leaderboardTable td:nth-child(4),
+#leaderboardTable td:nth-child(5),
+#leaderboardTable td:nth-child(6),
+#leaderboardTable td:nth-child(7) {
     text-align: right;
+    font-family: 'Courier New', monospace;
 }
 
-#leaderboardTable td {
-    padding: 1rem;
-    border-bottom: 1px solid #dee2e6;
-    color: #212529;
+#leaderboardTable th:nth-child(4), #leaderboardTable td:nth-child(4),
+#leaderboardTable th:nth-child(5), #leaderboardTable td:nth-child(5),
+#leaderboardTable th:nth-child(6), #leaderboardTable td:nth-child(6) {
+    width: 9%;
 }
 
-#leaderboardTable tbody tr {
-    transition: background-color 0.2s ease;
+#leaderboardTable th:nth-child(7), #leaderboardTable td:nth-child(7) {
+    width: 13%;
+}
+
+#leaderboardTable tbody tr:nth-child(even) {
+    background: #fcfcfc;
 }
 
 #leaderboardTable tbody tr:hover {
-    background-color: #f8f9fa;
+    background: #f3f6fa;
 }
 
-#leaderboardTable td:nth-child(1) {
-    font-weight: 600;
-    color: #D71313;
+@media (max-width: 900px) {
+    #leaderboardTable th, #leaderboardTable td {
+        font-size: 0.92rem;
+        padding: 0.5rem 0.3rem;
+    }
+    #leaderboardTable th:nth-child(2), #leaderboardTable td:nth-child(2),
+    #leaderboardTable th:nth-child(3), #leaderboardTable td:nth-child(3) {
+        width: 22%;
+    }
+    #leaderboardTable th:nth-child(4), #leaderboardTable td:nth-child(4),
+    #leaderboardTable th:nth-child(5), #leaderboardTable td:nth-child(5),
+    #leaderboardTable th:nth-child(6), #leaderboardTable td:nth-child(6) {
+        width: 10%;
+    }
+    #leaderboardTable th:nth-child(7), #leaderboardTable td:nth-child(7) {
+        width: 14%;
+    }
 }
 
-#leaderboardTable td:nth-child(4),
-#leaderboardTable td:nth-child(5),
-#leaderboardTable td:nth-child(6) {
-    font-family: 'Courier New', monospace;
-    text-align: right;
-}
-
-#leaderboardTable td:nth-child(6) {
-    font-weight: 600;
-}
-
-#leaderboardTable td:nth-child(6):not(:empty) {
-    color: #28a745;
+@media (max-width: 600px) {
+    #leaderboardTable th, #leaderboardTable td {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.2rem;
+    }
+    #leaderboardTable th:nth-child(2), #leaderboardTable td:nth-child(2),
+    #leaderboardTable th:nth-child(3), #leaderboardTable td:nth-child(3) {
+        width: 30%;
+    }
+    #leaderboardTable th:nth-child(4), #leaderboardTable td:nth-child(4),
+    #leaderboardTable th:nth-child(5), #leaderboardTable td:nth-child(5),
+    #leaderboardTable th:nth-child(6), #leaderboardTable td:nth-child(6) {
+        width: 12%;
+    }
+    #leaderboardTable th:nth-child(7), #leaderboardTable td:nth-child(7) {
+        width: 18%;
+    }
 }
 
 .error-message {
