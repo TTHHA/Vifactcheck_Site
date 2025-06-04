@@ -3,6 +3,9 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
+// Add JSON parsing middleware
+app.use(express.json());
+
 // Database configuration and initialization
 const DB_CONFIG = {
     maxRetries: 3,
@@ -17,9 +20,14 @@ try {
     const supabaseKey = process.env.SUPABASE_ANON_KEY;
     
     if (!supabaseUrl || !supabaseKey) {
+        console.error('Missing Supabase credentials:', {
+            hasUrl: !!supabaseUrl,
+            hasKey: !!supabaseKey
+        });
         throw new Error('Missing Supabase credentials');
     }
     
+    console.log('Initializing Supabase client...');
     supabase = createClient(supabaseUrl, supabaseKey, {
         auth: {
             persistSession: false
@@ -28,6 +36,14 @@ try {
             schema: 'public'
         }
     });
+    
+    // Test the connection
+    supabase.from('leaderboard').select('count').limit(1)
+        .then(() => console.log('Successfully connected to Supabase'))
+        .catch(err => {
+            console.error('Failed to connect to Supabase:', err);
+            throw err;
+        });
 } catch (error) {
     console.error('Failed to initialize Supabase client:', error);
     process.exit(1);
@@ -50,15 +66,26 @@ async function retryOperation(operation, maxRetries = DB_CONFIG.maxRetries) {
     let lastError;
     for (let i = 0; i < maxRetries; i++) {
         try {
-            return await operation();
+            console.log(`Database operation attempt ${i + 1} of ${maxRetries}`);
+            const result = await operation();
+            if (i > 0) {
+                console.log(`Database operation succeeded after ${i + 1} attempts`);
+            }
+            return result;
         } catch (error) {
             lastError = error;
+            console.error(`Database operation attempt ${i + 1} failed:`, error.message);
+            
             if (i < maxRetries - 1) {
-                await new Promise(resolve => setTimeout(resolve, DB_CONFIG.retryDelay));
+                const delay = DB_CONFIG.retryDelay * Math.pow(2, i); // Exponential backoff
+                console.log(`Retrying database operation in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
     }
-    throw lastError;
+    
+    console.error(`All ${maxRetries} database operation attempts failed. Last error:`, lastError);
+    throw new Error(`Database operation failed after ${maxRetries} attempts: ${lastError.message}`);
 }
 
 // Validate leaderboard entry
@@ -80,24 +107,54 @@ function validateLeaderboardEntry(entry) {
 // Load leaderboard data from Supabase with improved error handling
 async function loadData() {
     try {
+        console.log('Starting to load leaderboard data...');
+        
+        // First, check if the table exists
+        const { error: tableCheckError } = await supabase
+            .from('leaderboard')
+            .select('count')
+            .limit(1);
+            
+        if (tableCheckError) {
+            console.error('Table check error:', tableCheckError);
+            throw new Error(`Table check failed: ${tableCheckError.message}`);
+        }
+        
+        console.log('Table exists, proceeding with data fetch...');
+        
         const { data, error } = await retryOperation(async () => {
-            return await supabase
+            console.log('Executing database query...');
+            const result = await supabase
                 .from('leaderboard')
                 .select('*')
                 .order('fullContext', { ascending: false });
+            
+            if (result.error) {
+                console.error('Database query error:', result.error);
+                throw new Error(`Database query failed: ${result.error.message}`);
+            }
+            
+            return result;
         });
 
-        if (error) {
-            throw new Error(`Database error: ${error.message}`);
+        if (!data) {
+            console.warn('No data returned from database');
+            return [];
         }
 
+        console.log(`Retrieved ${data.length} entries from database`);
+
         // Filter and validate entries
-        return (data || [])
+        const validEntries = (data || [])
             .filter(entry => {
                 try {
+                    if (!entry) {
+                        console.warn('Skipping null/undefined entry');
+                        return false;
+                    }
                     return validateLeaderboardEntry(entry);
                 } catch (error) {
-                    console.warn(`Invalid entry skipped: ${error.message}`);
+                    console.warn(`Invalid entry skipped: ${error.message}`, entry);
                     return false;
                 }
             })
@@ -105,9 +162,18 @@ async function loadData() {
                 ...entry,
                 delta: entry.goldEvidence - entry.fullContext
             }));
+
+        console.log(`Successfully processed ${validEntries.length} valid entries`);
+        return validEntries;
     } catch (error) {
         console.error('Error loading leaderboard data:', error);
-        throw new Error('Failed to load leaderboard data');
+        if (error.message.includes('Database query failed')) {
+            throw new Error('Database connection error. Please try again later.');
+        }
+        if (error.message.includes('Table check failed')) {
+            throw new Error('Leaderboard table not found or inaccessible.');
+        }
+        throw new Error(`Failed to load leaderboard data: ${error.message}`);
     }
 }
 
@@ -135,7 +201,46 @@ function calculateF1(yTrue, yPred, label) {
 }
 
 // API Routes
-app.post('/upload_predictions', (req, res) => {
+app.get('/api/leaderboard', async (req, res) => {
+    try {
+        console.log('Received leaderboard request');
+        const sortBy = req.query.sortBy || 'fullContext';
+        
+        // Validate sortBy parameter
+        const validSortFields = ['fullContext', 'goldEvidence', 'delta'];
+        if (!validSortFields.includes(sortBy)) {
+            console.warn(`Invalid sort field requested: ${sortBy}`);
+            return res.status(400).json({ 
+                error: 'Invalid sort field', 
+                validFields: validSortFields 
+            });
+        }
+        
+        console.log(`Loading data with sort: ${sortBy}`);
+        // Load data from Supabase
+        const data = await loadData();
+        
+        // Sort the data
+        const sortedData = [...data].sort((a, b) => {
+            if (sortBy === 'delta') {
+                return b.delta - a.delta;
+            }
+            return (b[sortBy] || 0) - (a[sortBy] || 0);
+        });
+
+        console.log(`Returning ${sortedData.length} sorted entries`);
+        res.json(sortedData);
+    } catch (error) {
+        console.error('Error processing leaderboard request:', error);
+        res.status(500).json({ 
+            error: 'Internal server error',
+            message: error.message,
+            details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+});
+
+app.post('/api/upload_predictions', (req, res) => {
     try {
         const predictions = req.body; // Array of {id, prediction}
         const yTrue = [];
@@ -159,43 +264,72 @@ app.post('/upload_predictions', (req, res) => {
     }
 });
 
-app.get('/', async (req, res) => {
-    try {
-        const sortBy = req.query.sortBy || 'fullContext';
-        
-        // Validate sortBy parameter
-        const validSortFields = ['fullContext', 'goldEvidence', 'delta'];
-        if (!validSortFields.includes(sortBy)) {
-            return res.status(400).json({ 
-                error: 'Invalid sort field', 
-                validFields: validSortFields 
-            });
-        }
-        
-        // Load data from Supabase
-        const data = await loadData();
-        
-        // Sort the data
-        const sortedData = [...data].sort((a, b) => {
-            if (sortBy === 'delta') {
-                return b.delta - a.delta;
-            }
-            return (b[sortBy] || 0) - (a[sortBy] || 0);
-        });
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
-        res.json(sortedData);
-    } catch (error) {
-        console.error('Error processing request:', error);
-        res.status(500).json({ 
-            error: 'Internal server error',
-            message: error.message 
-        });
-    }
+// 404 handler
+app.use((req, res) => {
+    console.log(`404 Not Found: ${req.method} ${req.url}`);
+    res.status(404).json({
+        error: 'Not Found',
+        message: `The requested endpoint ${req.method} ${req.url} does not exist`
+    });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err);
+    res.status(500).json({
+        error: 'Internal Server Error',
+        message: err.message
+    });
 });
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+const server = app.listen(PORT, '0.0.0.0', (error) => {
+    if (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+    
+    const address = server.address();
+    console.log(`Server started successfully!`);
+    console.log(`Listening on: http://localhost:${PORT}`);
+    console.log('Available endpoints:');
+    console.log('- GET  /api/leaderboard');
+    console.log('- POST /api/upload_predictions');
+    console.log('- GET  /api/health');
+});
+
+// Handle server errors
+server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use. Please try a different port.`);
+    } else {
+        console.error('Server error:', error);
+    }
+    process.exit(1);
+});
+
+// Handle process termination
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received. Shutting down gracefully...');
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('SIGINT received. Shutting down gracefully...');
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
+});
 
 // Export the Express app for serverless environments
 module.exports = app; 
